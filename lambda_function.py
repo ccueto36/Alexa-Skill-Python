@@ -12,16 +12,10 @@ def lambda_handler(event, context):
 		return on_intent(event['request'], event['session'])
 
 def on_launch(launch_request, session):
-	""" Called when the user launches the skill without specifying what they
-	want
-	"""
-	# Dispatch to your skill's launch
 	return get_welcome_response()
-	
 
 def on_intent(intent_request, session):
 	
-	intent = intent_request['intent']
 	intent_name = intent_request['intent']['name']
 	
 	# Dispatch to your skill's intent handlers
@@ -46,60 +40,32 @@ def get_random_quote():
 		if(len(quote.text) != 0 and quote != None):
 			quotes_list.append(quote.text)
 	random_quote = random.choice(quotes_list)
-	
-	should_end_session = False
-	response = {
-	    'version': '1.0',
-	    'response': {
-	        'outputSpeech': {
-	            'type': 'PlainText',
-	            'text': random_quote
-	        },
-	        'should_end_session': should_end_session
-	    }
-	}
-	
-	return response
-	
+
+	return response_builder(random_quote, False, None)
+
 def get_welcome_response():
 	
 	speech_output = "Welcome to Travel Quotes. Please say tell me a quote or say exit"
 	reprompt_output = "Please say tell me a quote or say exit"
-	should_end_session = False
-	response = {
-	    'version': '1.0',
-	    'response': {
-	        'outputSpeech': {
-	            'type': 'PlainText',
-	            'text': speech_output,
-	        },
-	        'reprompt': {
-	        	'outputSpeech': {
-	            	'type': 'PlainText',
-	            	'text': reprompt_output
-	        	}
-	    	},
-	    	'shouldEndSession': should_end_session
-	    }
-	}
-	return response
+	return response_builder(speech_output, False, reprompt_output)
 
 def handle_session_end_request():
 	speech_output = "Thank you for trying Travel Quotes. " \
 	                "Have a nice day! "
-	# Setting this to true ends the session and exits the skill.
-	should_end_session = True
+	return response_builder(speech_output, True, None)
+
+def response_builder(output_speech, should_end_session, reprompt_speech):
 	response = {
 	    'version': '1.0',
 	    'response': {
 	        'outputSpeech': {
 	            'type': 'PlainText',
-	            'text': speech_output,
+	            'text': output_speech,
 	        },
 	        'reprompt': {
-	            'outputSpeech': {
-	                'type': 'PlainText',
-	                'text': reprompt_output
+	        	'outputSpeech': {
+	            	'type': 'PlainText',
+	            	'text': reprompt_speech
 	        	}
 	    	},
 	    	'shouldEndSession': should_end_session
